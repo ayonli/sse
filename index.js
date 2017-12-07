@@ -95,6 +95,15 @@ class SSE extends EventEmitter {
     end() {
         this.close();
     }
+
+    /** 
+     * See if the request come from an EventSource. Will check the header 
+     * field `accept`, see if it's `text/event-stream`, some client may not 
+     * set this field right, so be careful to use.
+     */
+    static get isEventSource() {
+        return this.req.headers.accept === "text/event-stream";
+    }
 }
 
 module.exports = SSE;

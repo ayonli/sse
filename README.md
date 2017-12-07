@@ -20,12 +20,11 @@ const http = require("http");
 const SSE = require("sfn-sse");
 
 const server = http.createServer((req, res) => {
-    // You can only accept event-stream requests in most cases.
-    if (req.headers.accept != "text/event-stream") {
+    if (!SSE.isEventSource) {
         res.end();
         return;
     }
-    
+
     var sse = new SSE(req, res),
         i = 0,
         timer = setInterval(() => {
