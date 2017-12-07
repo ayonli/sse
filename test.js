@@ -2,7 +2,7 @@ const http = require("http");
 const SSE = require("./");
 
 const server = http.createServer((req, res) => {
-    if (!SSE.isEventSource) {
+    if (!SSE.isEventSource(req)) {
         res.end();
         return;
     }
