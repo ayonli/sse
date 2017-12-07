@@ -17,8 +17,8 @@ class SSE extends EventEmitter {
         this.req = req;
         this.res = res;
 
-        this.req.socket.setNoDelay(true);
-        this.res.once("close", (...args) => {
+        req.socket.setNoDelay(true);
+        res.once("close", (...args) => {
             this.emit("close", ...args);
         }).once("finish", (...args) => {
             this.emit("finish", ...args);
@@ -91,15 +91,15 @@ class SSE extends EventEmitter {
         this.res.end();
     }
 
-    /** An alias of close(). */
+    /** An alias of sse.close(). */
     end() {
         this.close();
     }
 
     /** 
-     * See if the request come from an EventSource. Will check the header 
+     * See if the request comes from an EventSource. Will check the header 
      * field `accept`, see if it's `text/event-stream`, some client may not 
-     * set this field right, so be careful to use.
+     * set this right, so be careful to use.
      * @param {ClientRequest} req
      */
     static isEventSource(req) {
