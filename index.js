@@ -98,7 +98,7 @@ class SSE extends EventEmitter {
 
     /** 
      * See if the request comes from an EventSource. Will check the header 
-     * field `accept`, see if it's `text/event-stream`, some client may not 
+     * field `accept`, see if it's `text/event-stream`, some clients may not 
      * set this right, so be careful to use.
      * @param {ClientRequest} req
      */
