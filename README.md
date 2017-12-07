@@ -47,6 +47,7 @@ const source = new EventSource("http://localhost");
 
 source.onmessage = (event) => {
     console.log(event.data);
+    
     if (event.data.match(/10/)) {
         // Must close connection here, otherwise the client will reconnect.
         source.close();

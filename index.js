@@ -1,28 +1,18 @@
-const util = require('util');
-const EventEmitter = require('events');
-
 /**
  * Server-Sent Events based on HTML5 specs.
  * 
  * @see https://html.spec.whatwg.org/multipage/server-sent-events.html
  */
-class SSE extends EventEmitter {
+class SSE {
     /**
      * Initiates an instance.
      * @param {ClientRequest} req 
      * @param {ServerResponse} res 
      */
     constructor(req, res) {
-        super();
         this.req = req;
         this.res = res;
-
         req.socket.setNoDelay(true);
-        res.once("close", (...args) => {
-            this.emit("close", ...args);
-        }).once("finish", (...args) => {
-            this.emit("finish", ...args);
-        });
     }
 
     /**
@@ -89,11 +79,6 @@ class SSE extends EventEmitter {
         if (!this.res.headersSent)
             this.writeHead();
         this.res.end();
-    }
-
-    /** An alias of sse.close(). */
-    end() {
-        this.close();
     }
 
     /** 
