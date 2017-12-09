@@ -88,7 +88,7 @@ class SSE {
      * @param {ClientRequest} req
      */
     static isEventSource(req) {
-        return req.headers.accept === "text/event-stream";
+        return req.method == "GET" && req.headers.accept == "text/event-stream";
     }
 }
 
