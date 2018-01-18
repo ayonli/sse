@@ -1,8 +1,9 @@
 {
     "name": "sfn-sse",
-    "version": "0.1.3",
+    "version": "0.1.4",
     "description": "Simple Friendly Node.js Server-Sent Events implementation based on HTML5 API.",
     "main": "index.js",
+    "types": "index.d.ts",
     "scripts": {
         "test": "node test"
     },
@@ -13,7 +14,7 @@
     "author": {
         "name": "Ayon Lee",
         "email": "i@hyurl.com",
-        "url": "hyurl.com"
+        "url": "http://hyurl.com"
     },
     "repository": {
         "type": "git",

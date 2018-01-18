@@ -6,7 +6,7 @@
 class SSE {
     /**
      * Initiates an instance.
-     * @param {ClientRequest} req 
+     * @param {IncommingRequest} req 
      * @param {ServerResponse} res 
      */
     constructor(req, res) {
@@ -16,11 +16,11 @@ class SSE {
     }
 
     /**
-     * Writes response headers.
-     * @param {Number} code 
+     * Writes response head.
+     * @param {number} code 
      * @param {{[x: string]: string}} headers 
      */
-    writeHead(code = 200, headers = null) {
+    writeHead(code, headers = null) {
         this.res.writeHead(code, Object.assign({
             'Content-Type': 'text/event-stream',
             'Cache-Control': 'no-cache',
@@ -30,40 +30,36 @@ class SSE {
 
     /**
      * Sends data to the client.
-     * @param {String|{[x: string]: string}} event Event type/name. If `data` 
-     *  is missing, this argument will replace it, and no event name will be 
-     *  set. Alternatively you counld set this argument an object to set all 
-     *  options.
-     * @param {String} data Data buffer.
-     * @param {Number} id Last event ID.
-     * @param {Number} retry Reconnection time in milliseconds.
+     * @param {string} event Event type/name. If `data` is missing, this 
+     *  argument will replace it, and no event name will be set.
+     * @param {any} data Data buffer.
+     * @param {number} id Last event ID.
+     * @param {number} retry Reconnection time in milliseconds.
      */
-    send(event, data = null, id = undefined, retry = undefined) {
+    send(event, data = undefined, id = undefined, retry = undefined) {
         if (!this.res.headersSent)
-            this.writeHead();
+            this.writeHead(200);
 
-        var args = typeof event === "object" ? event : { event, data, id },
-            opt = Object.assign({
-                event: undefined,
-                data: null,
-                id: undefined,
-                retry: undefined
-            }, args);
-        if (opt.event && opt.data === null) {
-            opt.data = opt.event;
-            opt.event = undefined;
+        if (data === undefined) {
+            data = event;
+            event = undefined;
         }
-        opt.data = opt.data.replace(/(\r\n|\r|\n)/g, "\n").split("\n");
 
-        if (opt.event) // Set the event type/name.
-            this.res.write(`event: ${opt.event}\n`);
-        if (opt.id) // Set last event ID
-            this.res.write(`id: ${opt.id}\n`);
-        if (opt.retry) // Set reconnection time in milliseconds.
-            this.res.write(`retry: ${opt.retry}\n`);
+        if (typeof data !== "string") {
+            data = [JSON.stringify(data)];
+        } else {
+            data = data.replace(/(\r\n|\r|\n)/g, "\n").split("\n");
+        }
+
+        if (event) // Set the event type/name.
+            this.res.write(`event: ${event}\n`);
+        if (id) // Set last event ID
+            this.res.write(`id: ${id}\n`);
+        if (retry) // Set reconnection time in milliseconds.
+            this.res.write(`retry: ${retry}\n`);
 
         // Send data buffer.
-        for (let line of opt.data) {
+        for (let line of data) {
             this.res.write(`data: ${line}\n`);
         }
         this.res.write("\n");
@@ -77,15 +73,15 @@ class SSE {
      */
     close() {
         if (!this.res.headersSent)
-            this.writeHead();
+            this.writeHead(200);
         this.res.end();
     }
 
     /** 
-     * See if the request comes from an EventSource. Will check the header 
+     * Check if the request comes from an EventSource. Will check the header 
      * field `accept`, see if it's `text/event-stream`, some clients may not 
      * set this right, so be careful to use.
-     * @param {ClientRequest} req
+     * @param {IncommingRequest} req
      */
     static isEventSource(req) {
         return req.method == "GET" && req.headers.accept == "text/event-stream";
