@@ -28,7 +28,7 @@ declare class SSE {
      * Be noticed, the client will reconnect after the connection is cloesd, 
      * unless you send HTTP 204 No Content response code to tell it not to.
      */
-    close(entire?: boolean): void;
+    close(): void;
 
     /** 
      * Check if the request comes from an EventSource. Will check the header

@@ -1,6 +1,6 @@
 {
     "name": "sfn-sse",
-    "version": "0.1.4",
+    "version": "0.1.5",
     "description": "Simple Friendly Node.js Server-Sent Events implementation based on HTML5 API.",
     "main": "index.js",
     "types": "index.d.ts",
