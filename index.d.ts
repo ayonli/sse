@@ -31,7 +31,7 @@ declare class SSE {
     close(): void;
 
     /** 
-     * Check if the request comes from an EventSource. Will check the header
+     * Checks if the request comes from an EventSource. Will check the header
      * field `accept`, see if it's `text/event-stream`, some clients may not
      * set this right, so be careful to use.
      */

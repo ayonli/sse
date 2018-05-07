@@ -19,4 +19,6 @@ const server = http.createServer((req, res) => {
         }, 1000);
 });
 
-server.listen(80);
+server.listen(80, () => {
+    console.log("Server started, test in a browser via: new EventSource('http://localhost/').")
+});
