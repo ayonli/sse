@@ -13,29 +13,36 @@ declare class SSE {
 
     /**
      * Sends data to the client.
-     * @param id Last event ID.
+     * @param id If set, the browser will read it as lastEventId, and when
+     *  reconnecting after disconnection, the browser will send it as a header
+     *  'Last-Event-ID' to help the server rebuild the connection.
      * @param retry Reconnection time in milliseconds.
      */
-    send(data: any, id?: number, retry?: number): void;
+    send(data: any, id?: string, retry?: number): void;
     /**
      * @param event Event name.
+     * @param data Usually this argument should be a string, but if not, it 
+     *  will be transferred to JSON.
      */
-    send(event: string, data: any, id?: number, retry?: number): void;
+    send(event: string, data: any, id?: string, retry?: number): void;
 
     /** 
      * Closes the connection.
      * 
-     * Be noticed, the client will reconnect after the connection is cloesd, 
+     * Be noticed, the client will reconnect after the connection is closed, 
      * unless you send HTTP 204 No Content response code to tell it not to.
      */
     close(): void;
+}
 
+declare namespace SSE {
     /** 
      * Checks if the request comes from an EventSource. Will check the header
      * field `accept`, see if it's `text/event-stream`, some clients may not
      * set this right, so be careful to use.
      */
-    static isEventSource(req: IncomingMessage): boolean;
+    export function isEventSource(req: IncomingMessage): boolean;
 }
 
 export = SSE;
+export default SSE;

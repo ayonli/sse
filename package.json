@@ -1,12 +1,9 @@
 {
     "name": "sfn-sse",
-    "version": "0.1.6",
+    "version": "0.1.7",
     "description": "Simple Friendly Node.js Server-Sent Events implementation based on HTML5 API.",
     "main": "index.js",
     "types": "index.d.ts",
-    "engines": {
-        "node": ">=6.0"
-    },
     "scripts": {
         "test": "node test"
     },
@@ -27,5 +24,14 @@
         "url": "https://github.com/Hyurl/sfn-sse/issues",
         "email": "i@hyurl.com"
     },
-    "license": "MIT"
+    "license": "MIT",
+    "dependencies": {
+        "object-assign": "^4.1.1"
+    },
+    "devDependencies": {
+        "eventsource": "^1.0.5"
+    },
+    "engines": {
+        "node": ">=0.10"
+    }
 }
