@@ -45,4 +45,4 @@ declare namespace SSE {
 }
 
 export = SSE;
-export default SSE;
+// export default SSE;

@@ -76,6 +76,11 @@ var SSE = (function () {
         this.res.end();
     };
 
+    return SSE;
+}());
+
+/** @namespace */
+(function (SSE) {
     /** 
      * Checks if the request comes from an EventSource. Will check the header 
      * field `accept`, see if it's `text/event-stream`, some clients may not 
@@ -84,9 +89,7 @@ var SSE = (function () {
     SSE.isEventSource = function (req) {
         return req.method == "GET" && req.headers.accept == "text/event-stream";
     }
-
-    return SSE;
-}());
+}(SSE));
 
 module.exports = SSE;
-module.exports.default = SSE;
+// module.exports.default = SSE;
