@@ -1,0 +1,22 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "target": "es5",
+        "preserveConstEnums": true,
+        "rootDir": "src",
+        "outDir": "dist",
+        "newLine": "LF",
+        "experimentalDecorators": true,
+        "sourceMap": true,
+        "pretty": true,
+        "noUnusedLocals": true,
+        "importHelpers": true
+    },
+    "files": [
+        "src/index.ts",
+    ],
+    "exclude": [
+        "node_modules/*",
+        "./node_modules/sfn-mail/src/index.ts"
+    ]
+}

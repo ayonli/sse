@@ -1,11 +1,11 @@
 {
     "name": "sfn-sse",
-    "version": "0.2.0",
+    "version": "0.3.0",
     "description": "Simple Friendly Node.js Server-Sent Events implementation based on HTML5 API.",
-    "main": "index.js",
-    "types": "index.d.ts",
+    "main": "dist/index.js",
+    "types": "src/index.ts",
     "scripts": {
-        "test": "node test"
+        "test": "mocha"
     },
     "keywords": [
         "sfn",
@@ -26,9 +26,15 @@
     },
     "license": "MIT",
     "devDependencies": {
-        "eventsource": "^1.0.5"
+        "@types/node": "^11.10.4",
+        "@types/shortid": "0.0.29",
+        "eventsource": "^1.0.5",
+        "mocha": "^6.0.2"
     },
     "engines": {
         "node": ">=4"
+    },
+    "dependencies": {
+        "shortid": "^2.2.14"
     }
 }
