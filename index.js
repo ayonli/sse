@@ -1,4 +1,4 @@
-const assign = require("object-assign");
+"use strict";
 
 /**
  * Server-Sent Events based on HTML5 specs.
@@ -19,11 +19,13 @@ var SSE = (function () {
      * @param {{[x: string]: string}} headers 
      */
     SSE.prototype.writeHead = function (code, headers) {
-        this.res.writeHead(code, assign({
+        this.res.writeHead(code, Object.assign({
             'Content-Type': 'text/event-stream',
             'Cache-Control': 'no-cache',
             'Connection': 'keep-alive'
         }, headers));
+
+        return this;
     }
 
     /**
@@ -33,6 +35,7 @@ var SSE = (function () {
      * @param {any} data Data buffer.
      * @param {string} id Last event ID.
      * @param {number} retry Reconnection time in milliseconds.
+     * @returns {boolean}
      */
     SSE.prototype.send = function (event, data, id, retry) {
         if (!this.res.headersSent)
@@ -46,7 +49,7 @@ var SSE = (function () {
         if (typeof data !== "string") {
             data = [JSON.stringify(data)];
         } else {
-            data = data.replace(/(\r\n|\r|\n)/g, "\n").split("\n");
+            data = data.replace(/(\r\n|\r)/g, "\n").split("\n");
         }
 
         if (event) // Set the event type/name.
@@ -57,10 +60,11 @@ var SSE = (function () {
             this.res.write(`retry: ${retry}\n`);
 
         // Send data buffer.
-        for (var line of data) {
+        for (let line of data) {
             this.res.write(`data: ${line}\n`);
         }
-        this.res.write("\n");
+
+        return this.res.write("\n");
     };
 
     /** 

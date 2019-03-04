@@ -1,6 +1,6 @@
 {
     "name": "sfn-sse",
-    "version": "0.1.8",
+    "version": "0.2.0",
     "description": "Simple Friendly Node.js Server-Sent Events implementation based on HTML5 API.",
     "main": "index.js",
     "types": "index.d.ts",
@@ -25,13 +25,10 @@
         "email": "i@hyurl.com"
     },
     "license": "MIT",
-    "dependencies": {
-        "object-assign": "^4.1.1"
-    },
     "devDependencies": {
         "eventsource": "^1.0.5"
     },
     "engines": {
-        "node": ">=0.10"
+        "node": ">=4"
     }
 }

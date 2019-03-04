@@ -9,7 +9,7 @@ declare class SSE {
     constructor(req: IncomingMessage, res: ServerResponse);
 
     /** Writes response head. */
-    writeHead(code: number, headers?: {[field: string]: string | string[]});
+    writeHead(code: number, headers?: {[field: string]: string | string[]}): this;
 
     /**
      * Sends data to the client.
@@ -18,13 +18,13 @@ declare class SSE {
      *  'Last-Event-ID' to help the server rebuild the connection.
      * @param retry Reconnection time in milliseconds.
      */
-    send(data: any, id?: string, retry?: number): void;
+    send(data: any, id?: string, retry?: number): boolean;
     /**
      * @param event Event name.
      * @param data Usually this argument should be a string, but if not, it 
      *  will be transferred to JSON.
      */
-    send(event: string, data: any, id?: string, retry?: number): void;
+    send(event: string, data: any, id?: string, retry?: number): boolean;
 
     /** 
      * Closes the connection.

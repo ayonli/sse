@@ -2,9 +2,7 @@ var http = require("http");
 var SSE = require("./");
 var EventSource = require("eventsource");
 var assert = require("assert");
-var assign = require("object-assign");
 
-var sse, sse2, sse3;
 var count = 0;
 var jsonData = [
     "this is a string",
@@ -21,7 +19,7 @@ var server = http.createServer(function (req, res) {
     }
 
     if (req.url == "/timer") {
-        sse = new SSE(req, res);
+        var sse = new SSE(req, res);
         var timer = setInterval(function () {
             count += 1;
             sse.send("This is message " + count + "."); // Send message every seconds.
@@ -53,11 +51,11 @@ server.listen(3000, function () {
     var client = new EventSource("http://localhost:3000/timer");
     client.onopen = function (e) {
         assert.equal(e.constructor.name, "Event");
-        assert.deepStrictEqual(assign({}, e), { type: "open" });
+        assert.deepStrictEqual(Object.assign({}, e), { type: "open" });
     };
     client.onmessage = function (e) {
         assert.equal(e.constructor.name, "MessageEvent");
-        assert.deepStrictEqual(assign({}, e), {
+        assert.deepStrictEqual(Object.assign({}, e), {
             type: "message",
             data: "This is message " + count + ".",
             lastEventId: "",
@@ -96,7 +94,7 @@ server.listen(3000, function () {
     var client3 = new EventSource("http://localhost:3000/to-event");
     client3.addEventListener("my-event", function (e) {
         assert.equal(e.constructor.name, "MessageEvent");
-        assert.deepStrictEqual(assign({}, e), {
+        assert.deepStrictEqual(Object.assign({}, e), {
             type: "my-event",
             data: "This message will be sent to a certain event",
             lastEventId: "",
