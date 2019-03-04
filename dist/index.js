@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const shortid = require("shortid");
+const MarkClosed = {};
 /**
  * Server-Sent Events based on HTML5 specs.
  *
@@ -17,6 +18,7 @@ class SSE {
         this.res = res;
         this.retry = retry;
         this.id = req.headers["last-event-id"] || shortid.generate();
+        MarkClosed[this.id] && this.close();
     }
     /** Whether the connection is new. */
     get isNew() {
@@ -61,13 +63,14 @@ class SSE {
         this.ensureHead().res.write(`event: ${event}\n`);
         return this.send(data);
     }
-    /**
-     * Closes the connection.
-     *
-     * Be noticed, the client may reconnect after the connection is closed,
-     * unless you send HTTP 204 No Content response code to tell it not to.
-     */
+    /** Closes the connection. */
     close(cb) {
+        if (!MarkClosed[this.id]) {
+            MarkClosed[this.id] = true;
+        }
+        else {
+            delete MarkClosed[this.id];
+        }
         return this.ensureHead(204).res.end(cb);
     }
     ;

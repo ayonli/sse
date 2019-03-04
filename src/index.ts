@@ -2,6 +2,8 @@ import { IncomingMessage, ServerResponse } from "http";
 import { Http2ServerRequest, Http2ServerResponse } from "http2";
 import shortid = require("shortid");
 
+const MarkClosed: { [id: string]: boolean } = {};
+
 /**
  * Server-Sent Events based on HTML5 specs.
  * 
@@ -25,6 +27,7 @@ export class SSE {
         readonly retry: number = 0
     ) {
         this.id = <string>req.headers["last-event-id"] || shortid.generate();
+        MarkClosed[this.id] && this.close();
     }
 
     /** Whether the connection is new. */
@@ -79,13 +82,14 @@ export class SSE {
         return this.send(data);
     }
 
-    /** 
-     * Closes the connection.
-     * 
-     * Be noticed, the client may reconnect after the connection is closed, 
-     * unless you send HTTP 204 No Content response code to tell it not to.
-     */
+    /** Closes the connection. */
     close(cb?: () => void) {
+        if (!MarkClosed[this.id]) {
+            MarkClosed[this.id] = true;
+        } else {
+            delete MarkClosed[this.id];
+        }
+
         return this.ensureHead(204).res.end(cb);
     };
 
