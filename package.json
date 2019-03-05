@@ -1,7 +1,7 @@
 {
     "name": "sfn-sse",
-    "version": "0.3.1",
-    "description": "Simple Friendly Node.js Server-Sent Events implementation based on HTML5 API.",
+    "version": "0.3.2",
+    "description": "Sugar Featured Node.js Server-Sent Events implementation based on HTML5 API.",
     "main": "dist/index.js",
     "types": "src/index.ts",
     "scripts": {

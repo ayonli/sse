@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const shortid = require("shortid");
 const MarkClosed = {};
+const closed = Symbol("closed");
 /**
  * Server-Sent Events based on HTML5 specs.
  *
@@ -18,11 +19,19 @@ class SSE {
         this.res = res;
         this.retry = retry;
         this.id = req.headers["last-event-id"] || shortid.generate();
-        MarkClosed[this.id] && this.close();
+        this.isClosed && this.close();
     }
     /** Whether the connection is new. */
     get isNew() {
         return !this.req.headers["last-event-id"];
+    }
+    /**
+     * Whether the connection is closed. This property is used to check whether
+     * a re-connection has been marked closed, once closed, the server must not
+     * do anything continuing.
+     */
+    get isClosed() {
+        return this[closed] || (this[closed] = MarkClosed[this.id] === true);
     }
     /** Sends a response header to the client. */
     writeHead(code, headers) {
