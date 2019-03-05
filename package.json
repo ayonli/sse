@@ -1,6 +1,6 @@
 {
     "name": "sfn-sse",
-    "version": "0.3.2",
+    "version": "0.3.3",
     "description": "Sugar Featured Node.js Server-Sent Events implementation based on HTML5 API.",
     "main": "dist/index.js",
     "types": "src/index.ts",
@@ -32,7 +32,7 @@
         "mocha": "^6.0.2"
     },
     "engines": {
-        "node": ">=4"
+        "node": ">=6"
     },
     "dependencies": {
         "shortid": "^2.2.14"
