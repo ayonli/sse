@@ -77,7 +77,6 @@ describe("SSE Tests", () => {
             client.close();
             done();
         });
-
     });
 
     it("should connect to the server and receive multiple times of data as expected", done => {

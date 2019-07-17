@@ -1,7 +1,7 @@
 {
     "name": "sfn-sse",
-    "version": "0.3.2",
-    "description": "Simple Friendly Node.js Server-Sent Events implementation based on HTML5 API.",
+    "version": "0.3.4",
+    "description": "Sugar Featured Node.js Server-Sent Events implementation based on HTML5 API.",
     "main": "dist/index.js",
     "types": "src/index.ts",
     "scripts": {
@@ -32,7 +32,7 @@
         "mocha": "^6.1.4"
     },
     "engines": {
-        "node": ">=4"
+        "node": ">=6"
     },
     "dependencies": {
         "shortid": "^2.2.14"
