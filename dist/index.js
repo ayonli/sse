@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const shortid = require("shortid");
-const MarkClosed = {};
+const nanoid = require("nanoid");
+const MarkClosed = new Set();
 const closed = Symbol("closed");
 /**
  * Server-Sent Events based on HTML5 specs.
@@ -18,7 +18,7 @@ class SSE {
         this.req = req;
         this.res = res;
         this.retry = retry;
-        this.id = req.headers["last-event-id"] || shortid.generate();
+        this.id = req.headers["last-event-id"] || nanoid();
         this.isClosed && this.close();
     }
     /** Whether the connection is new. */
@@ -27,11 +27,12 @@ class SSE {
     }
     /**
      * Whether the connection is closed. This property is used to check whether
-     * a re-connection has been marked closed, once closed, the server must not
-     * do anything continuing.
+     * a re-connection has been marked closed, once closed, the server must
+     * terminate the connection immediately.
      */
     get isClosed() {
-        return this[closed] || (this[closed] = MarkClosed[this.id] === true);
+        var _a;
+        return _a = this[closed], (_a !== null && _a !== void 0 ? _a : (this[closed] = MarkClosed.has(this.id)));
     }
     /** Sends a response header to the client. */
     writeHead(code, headers) {
@@ -74,11 +75,11 @@ class SSE {
     }
     /** Closes the connection. */
     close(cb) {
-        if (!MarkClosed[this.id]) {
-            MarkClosed[this.id] = true;
+        if (!MarkClosed.has(this.id)) {
+            MarkClosed.add(this.id);
         }
         else {
-            delete MarkClosed[this.id];
+            MarkClosed.delete(this.id);
         }
         return this.ensureHead(204).res.end(cb);
     }

@@ -1,8 +1,8 @@
 import { IncomingMessage, ServerResponse } from "http";
 import { Http2ServerRequest, Http2ServerResponse } from "http2";
-import shortid = require("shortid");
+import nanoid = require("nanoid");
 
-const MarkClosed: { [id: string]: boolean } = {};
+const MarkClosed = new Set<string>();
 const closed = Symbol("closed");
 
 /**
@@ -27,7 +27,7 @@ export class SSE {
         protected res: ServerResponse | Http2ServerResponse,
         readonly retry: number = 0
     ) {
-        this.id = <string>req.headers["last-event-id"] || shortid.generate();
+        this.id = <string>req.headers["last-event-id"] || nanoid();
         this.isClosed && this.close();
     }
 
@@ -38,11 +38,11 @@ export class SSE {
 
     /** 
      * Whether the connection is closed. This property is used to check whether
-     * a re-connection has been marked closed, once closed, the server must not
-     * do anything continuing.
+     * a re-connection has been marked closed, once closed, the server must
+     * terminate the connection immediately.
      */
     get isClosed() {
-        return this[closed] || (this[closed] = MarkClosed[this.id] === true);
+        return this[closed] ?? (this[closed] = MarkClosed.has(this.id));
     }
 
     /** Sends a response header to the client. */
@@ -94,10 +94,10 @@ export class SSE {
 
     /** Closes the connection. */
     close(cb?: () => void) {
-        if (!MarkClosed[this.id]) {
-            MarkClosed[this.id] = true;
+        if (!MarkClosed.has(this.id)) {
+            MarkClosed.add(this.id);
         } else {
-            delete MarkClosed[this.id];
+            MarkClosed.delete(this.id);
         }
 
         return this.ensureHead(204).res.end(cb);

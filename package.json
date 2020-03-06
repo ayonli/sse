@@ -1,6 +1,6 @@
 {
     "name": "sfn-sse",
-    "version": "0.3.4",
+    "version": "0.3.5",
     "description": "Sugar Featured Node.js Server-Sent Events implementation based on HTML5 API.",
     "main": "dist/index.js",
     "types": "src/index.ts",
@@ -26,8 +26,7 @@
     },
     "license": "MIT",
     "devDependencies": {
-        "@types/node": "^11.13.17",
-        "@types/shortid": "0.0.29",
+        "@types/nanoid": "^2.1.0",
         "eventsource": "^1.0.7",
         "mocha": "^6.1.4"
     },
@@ -35,6 +34,7 @@
         "node": ">=6"
     },
     "dependencies": {
-        "shortid": "^2.2.14"
+        "@types/node": "^13.7.7",
+        "nanoid": "^2.1.11"
     }
 }
