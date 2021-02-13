@@ -17,6 +17,9 @@ export class SSE {
      * client EventSource, when the client reconnect, this ID will be reused.
      */
     readonly id: string;
+    private _resWriteHead: ServerResponse["writeHead"] | Http2ServerResponse["writeHead"];
+    private _resWrite: ServerResponse["write"];
+    private _resEnd: ServerResponse["end"];
 
     /**
      * @param retry The re-connection time to use when attempting to send the 
@@ -27,6 +30,11 @@ export class SSE {
         protected res: ServerResponse | Http2ServerResponse,
         readonly retry: number = 0
     ) {
+        // Store the original functions in case they're being overridden.
+        this._resWriteHead = res.writeHead.bind(res);
+        this._resWrite = res.write.bind(res);
+        this._resEnd = res.end.bind(res);
+
         this.id = <string>req.headers["last-event-id"] || nanoid();
         this.isClosed && this.close();
     }
@@ -46,8 +54,8 @@ export class SSE {
     }
 
     /** Sends a response header to the client. */
-    writeHead(code: number, headers?: { [x: string]: string | string[] }) {
-        this.res.writeHead(code, Object.assign({
+    writeHead(code: number, headers?: { [x: string]: string | string[]; }) {
+        this._resWriteHead(code, Object.assign({
             'Content-Type': 'text/event-stream',
             'Cache-Control': 'no-cache',
             'Connection': 'keep-alive'
@@ -70,16 +78,16 @@ export class SSE {
             frames = data.replace(/(\r\n|\r)/g, "\n").split("\n");
         }
 
-        this.res.write(`id: ${this.id}\n`);
+        this._resWrite(`id: ${this.id}\n`);
 
         if (this.retry)
-            this.res.write(`retry: ${this.retry}\n`);
+            this._resWrite(`retry: ${this.retry}\n`);
 
         for (let frame of frames) {
-            this.res.write(`data: ${frame}\n`);
+            this._resWrite(`data: ${frame}\n`);
         }
 
-        return this.res.write("\n");
+        return this._resWrite("\n");
     }
 
     /**
@@ -88,7 +96,8 @@ export class SSE {
      * code should use `addEventListener()` to listen for named events.
      */
     emit(event: string, data?: any) {
-        this.ensureHead().res.write(`event: ${event}\n`);
+        this.ensureHead();
+        this._resWrite(`event: ${event}\n`);
         return this.send(data);
     }
 
@@ -100,8 +109,9 @@ export class SSE {
             MarkClosed.delete(this.id);
         }
 
-        return this.ensureHead(204).res.end(cb);
-    };
+        this.ensureHead(204);
+        this._resEnd(cb);
+    }
 
     private ensureHead(code: number = 200) {
         this.res.headersSent || this.writeHead(code);

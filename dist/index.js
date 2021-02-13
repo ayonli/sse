@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.SSE = void 0;
 const nanoid = require("nanoid");
 const MarkClosed = new Set();
 const closed = Symbol("closed");
@@ -18,6 +19,10 @@ class SSE {
         this.req = req;
         this.res = res;
         this.retry = retry;
+        // Store the original functions in case they're being overridden.
+        this._resWriteHead = res.writeHead.bind(res);
+        this._resWrite = res.write.bind(res);
+        this._resEnd = res.end.bind(res);
         this.id = req.headers["last-event-id"] || nanoid();
         this.isClosed && this.close();
     }
@@ -32,11 +37,11 @@ class SSE {
      */
     get isClosed() {
         var _a;
-        return _a = this[closed], (_a !== null && _a !== void 0 ? _a : (this[closed] = MarkClosed.has(this.id)));
+        return (_a = this[closed]) !== null && _a !== void 0 ? _a : (this[closed] = MarkClosed.has(this.id));
     }
     /** Sends a response header to the client. */
     writeHead(code, headers) {
-        this.res.writeHead(code, Object.assign({
+        this._resWriteHead(code, Object.assign({
             'Content-Type': 'text/event-stream',
             'Cache-Control': 'no-cache',
             'Connection': 'keep-alive'
@@ -56,13 +61,13 @@ class SSE {
         else {
             frames = data.replace(/(\r\n|\r)/g, "\n").split("\n");
         }
-        this.res.write(`id: ${this.id}\n`);
+        this._resWrite(`id: ${this.id}\n`);
         if (this.retry)
-            this.res.write(`retry: ${this.retry}\n`);
+            this._resWrite(`retry: ${this.retry}\n`);
         for (let frame of frames) {
-            this.res.write(`data: ${frame}\n`);
+            this._resWrite(`data: ${frame}\n`);
         }
-        return this.res.write("\n");
+        return this._resWrite("\n");
     }
     /**
      * Emits an event to the client, the message will be dispatched on the
@@ -70,7 +75,8 @@ class SSE {
      * code should use `addEventListener()` to listen for named events.
      */
     emit(event, data) {
-        this.ensureHead().res.write(`event: ${event}\n`);
+        this.ensureHead();
+        this._resWrite(`event: ${event}\n`);
         return this.send(data);
     }
     /** Closes the connection. */
@@ -81,9 +87,9 @@ class SSE {
         else {
             MarkClosed.delete(this.id);
         }
-        return this.ensureHead(204).res.end(cb);
+        this.ensureHead(204);
+        this._resEnd(cb);
     }
-    ;
     ensureHead(code = 200) {
         this.res.headersSent || this.writeHead(code);
         return this;
