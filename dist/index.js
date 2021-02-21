@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SSE = void 0;
-const nanoid = require("nanoid");
+const nanoid_1 = require("nanoid");
 const MarkClosed = new Set();
 const closed = Symbol("closed");
 /**
@@ -23,7 +23,7 @@ class SSE {
         this._resWriteHead = res.writeHead.bind(res);
         this._resWrite = res.write.bind(res);
         this._resEnd = res.end.bind(res);
-        this.id = req.headers["last-event-id"] || nanoid();
+        this.id = req.headers["last-event-id"] || nanoid_1.nanoid();
         this.isClosed && this.close();
     }
     /** Whether the connection is new. */

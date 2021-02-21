@@ -1,6 +1,6 @@
 import { IncomingMessage, ServerResponse } from "http";
 import { Http2ServerRequest, Http2ServerResponse } from "http2";
-import nanoid = require("nanoid");
+import { nanoid } from "nanoid";
 
 const MarkClosed = new Set<string>();
 const closed = Symbol("closed");
