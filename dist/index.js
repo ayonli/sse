@@ -53,7 +53,7 @@ class SSE {
         this.ensureHead();
         let frames;
         if (data === undefined) {
-            frames = [];
+            frames = [""];
         }
         else if (typeof data !== "string") {
             frames = [JSON.stringify(data)];

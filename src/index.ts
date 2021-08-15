@@ -71,7 +71,7 @@ export class SSE {
         let frames: string[];
 
         if (data === undefined) {
-            frames = [];
+            frames = [""];
         } else if (typeof data !== "string") {
             frames = [JSON.stringify(data)];
         } else {
