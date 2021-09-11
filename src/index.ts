@@ -15,6 +15,8 @@ export class SSE {
     /**
      * The unique ID of the SSE connection, also used as `lastEventId` of the
      * client EventSource, when the client reconnect, this ID will be reused.
+     * Optionally, we can set an custom `id` in the url's query string when
+     * connecting via EventSource.
      */
     readonly id: string;
     private _resWriteHead: ServerResponse["writeHead"] | Http2ServerResponse["writeHead"];
@@ -35,7 +37,16 @@ export class SSE {
         this._resWrite = res.write.bind(res);
         this._resEnd = res.end.bind(res);
 
-        this.id = <string>req.headers["last-event-id"] || nanoid();
+        let id: string;
+
+        if (typeof req["query"] === "object" && req["query"]) {
+            id = req["query"]["id"];
+        } else {
+            const searchParams = new URL(req.url, "http://localhost").searchParams;
+            id = searchParams.get("id");
+        }
+
+        this.id = id || <string>req.headers["last-event-id"] || nanoid();
         this.isClosed && this.close();
     }
 

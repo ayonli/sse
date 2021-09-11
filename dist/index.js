@@ -23,7 +23,15 @@ class SSE {
         this._resWriteHead = res.writeHead.bind(res);
         this._resWrite = res.write.bind(res);
         this._resEnd = res.end.bind(res);
-        this.id = req.headers["last-event-id"] || nanoid_1.nanoid();
+        let id;
+        if (typeof req["query"] === "object" && req["query"]) {
+            id = req["query"]["id"];
+        }
+        else {
+            const searchParams = new URL(req.url, "http://localhost").searchParams;
+            id = searchParams.get("id");
+        }
+        this.id = id || req.headers["last-event-id"] || nanoid_1.nanoid();
         this.isClosed && this.close();
     }
     /** Whether the connection is new. */

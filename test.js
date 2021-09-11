@@ -29,6 +29,9 @@ var server = http.createServer((req, res) => {
                 clearInterval(timer);
             }
         }, 100);
+    } else if (req.url.startsWith("/customId")) {
+        let sse = new SSE(req, res);
+        sse.send(sse.id);
     }
 });
 
@@ -91,6 +94,19 @@ describe("SSE Tests", () => {
                 client.close();
                 done();
             }
+        };
+    });
+
+    it("should connect to the server with a custom ID as expected", done => {
+        var client = new EventSource("http://localhost:3000/customId?id=abc");
+
+        client.onmessage = (e) => {
+            assert.strictEqual(e.type, "message");
+            assert.strictEqual(e.lastEventId, "abc");
+            assert.strictEqual(e.data, "abc");
+
+            client.close();
+            done();
         };
     });
 });
