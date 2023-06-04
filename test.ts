@@ -1,8 +1,8 @@
-var http = require("http");
-var SSE = require(".").default;
-var EventSource = require("eventsource");
-var assert = require("assert");
+import SSE  from ".";
+import * as http from "http";
+import * as assert from "assert";
 
+global["EventSource"] ||= require("eventsource");
 var count = 0;
 
 var server = http.createServer((req, res) => {

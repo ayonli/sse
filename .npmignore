@@ -1,3 +1,6 @@
 .vscode/
 node_modules/
 *.tgz
+.*
+*.ts
+!*.d.ts
