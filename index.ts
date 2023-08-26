@@ -42,15 +42,15 @@ export class SSE {
         if (typeof req["query"] === "object" && req["query"]) {
             id = req["query"]["id"];
         } else {
-            const searchParams = new URL(req.url, "http://localhost").searchParams;
-            id = searchParams.get("id");
+            const searchParams = new URL(req.url as string, "http://localhost").searchParams;
+            id = searchParams.get("id") as string;
         }
 
         this.id = id || <string>req.headers["last-event-id"] || nanoid();
         this.isClosed && this.close();
     }
 
-    /** Whether the connection is new. */
+    /** Whether the connection is newly created. */
     get isNew() {
         return !this.req.headers["last-event-id"];
     }

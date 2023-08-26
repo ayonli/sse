@@ -1,7 +1,7 @@
 {
-    "name": "sfn-sse",
+    "name": "@ayonli/sse",
     "version": "0.3.10",
-    "description": "Sugar Featured Node.js Server-Sent Events implementation based on HTML5 API.",
+    "description": "Server-Sent Events implementation for Node.js with Session Support Enhancement.",
     "main": "index.js",
     "types": "index.d.ts",
     "scripts": {
@@ -12,16 +12,15 @@
         "test": "mocha"
     },
     "keywords": [
-        "sfn",
         "see"
     ],
     "author": "A-yon Lee <the@ayon.li>",
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/hyurl/sfn-sse.git"
+        "url": "git+https://github.com/ayonli/sse.git"
     },
     "bugs": {
-        "url": "https://github.com/hyurl/sfn-sse/issues"
+        "url": "https://github.com/ayonli/sse/issues"
     },
     "license": "MIT",
     "devDependencies": {

@@ -29,7 +29,7 @@ var server = http.createServer((req, res) => {
                 clearInterval(timer);
             }
         }, 100);
-    } else if (req.url.startsWith("/customId")) {
+    } else if (req.url?.startsWith("/customId")) {
         let sse = new SSE(req, res);
         sse.send(sse.id);
     }
