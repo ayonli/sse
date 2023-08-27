@@ -111,7 +111,7 @@ es.addEventListener("connect", event => {
 NOTE: don't store the ID in `localStorage`, which is shared across all tabs of
 the same site.
 
-### About Closing
+## About Closing
 
 According to the
 [Server-Sent Events](https://html.spec.whatwg.org/multipage/server-sent-events.html) 
