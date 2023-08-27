@@ -1,6 +1,6 @@
 {
     "name": "@ayonli/sse",
-    "version": "0.3.10",
+    "version": "0.4.0",
     "description": "Server-Sent Events implementation for Node.js with Session Support Enhancement.",
     "main": "index.js",
     "types": "index.d.ts",

@@ -15,22 +15,32 @@ npm install @ayonli/sse
 import * as http from "http";
 import SSE from "@ayonli/sse";
 
+const store = new Map<string, SSE>();
+
+// Sync server time to the clients every minute.
+setTimeout(() => {
+    const time = new Date().toISOString();
+
+    store.forEach((sse) => {
+        sse.emit("sync-time", time);
+    })
+}, 60_000);
+
 const server = http.createServer((req, res) => {
     if (SSE.isEventSource(req)) {
         const sse = new SSE(req, res);
 
-        if (sse.isClosed) { // check if the the connection has been marked closed.
+        if (sse.isClosed) { // Check if the the connection has been marked closed.
             return;
         } else {
-            let i = 0,
-            timer = setInterval(() => {
-                i += 1;
-                sse.send(`This is msg ${i}.`); // Send message every seconds.
-                if (i === 10) {
-                    sse.close(); // Close the connection.
-                    clearInterval(timer);
-                }
-            }, 1000);
+            store.set(sse.id, sse); // Store the SSE instance for future use.
+
+            sse.emit("connect"); // notify connection established.
+
+            res.once("close", () => {
+                // Remove the SSE instance once the connection is lost.
+                store.delete(sse.id);
+            });
         }
     } else {
         // do other stuffs
@@ -43,15 +53,12 @@ server.listen(80);
 **Client Side:**
 
 ```javascript
-const source = new EventSource("http://localhost");
+const es = new EventSource("http://localhost");
 
-source.onmessage = (event) => {
-    console.log(event.data);
-
-    if (event.data.match(/10/)) {
-        source.close(); // this guarantees no reconnection will be fired
-    }
-};
+// Listen to server-sent event for data.
+es.addEventListener("sync-time", event => {
+    console.log("server time:", event.data);
+});
 ```
 
 ## API
@@ -67,10 +74,12 @@ source.onmessage = (event) => {
     the server must not do anything continuing.
 - `writeHead(code: number, headers?: { [x: string]: string | string[] }): this`
     Sends a response header to the client.
-- `send(data: any): boolean` Sends data to the client.
+- `send(data: any): boolean` Sends data to the client which will be received by
+    the `es.onmessage` callback function. Data will be serialize via JSON if
+    they're not string.
 - `emit(event: string, data?: any): boolean` Emits an event to the client, the 
     message will be dispatched on the browser to the listener for the specified 
-    event name; the website source code should use `addEventListener()` to 
+    event name; the website source code should use `es.addEventListener()` to 
     listen for named events.
 - `close(cb?: () => void): void` Closes the connection.
 
@@ -92,13 +101,15 @@ This is how:
 
 ```ts
 const sseId = sessionStorage.getItem("sseId");
-const source = new EventSource("http://localhost" + sseId ? `?id=${sseId}` : "");
+const es = new EventSource("http://localhost" + sseId ? `?id=${sseId}` : "");
 
-source.onmessage = (event) => {
+es.addEventListener("connect", event => {
     sessionStorage.setItem("sseId", event.lastEventId);
-    // ...
-};
+});
 ```
+
+NOTE: don't store the ID in `localStorage`, which is shared across all tabs of
+the same site.
 
 ### About Closing
 
@@ -117,3 +128,7 @@ and immediately to prevent the client re-connecting.
 That said, the server should check the property `isClosed` at the very beginning
 of the request life cycle, to see if a connection has been marked closed, once
 closed, the server must not do anything continuing.
+
+Apart from closing the connection on the server side, the client can call
+`es.close()` to close the connection positively, and no-reconnection will be
+fired afterwards.
