@@ -1,9 +1,10 @@
-import SSE  from ".";
+import { SSE } from ".";
 import * as http from "http";
 import * as assert from "assert";
-
-global["EventSource"] ||= require("eventsource");
-var count = 0;
+// @ts-ignore
+import dEventSource = require("eventsource");
+import jsext from "@ayonli/jsext";
+import "js-magic";
 
 var server = http.createServer((req, res) => {
     if (!SSE.isEventSource(req)) {
@@ -22,6 +23,7 @@ var server = http.createServer((req, res) => {
         sse.emit("my-event", "Hello, World!");
     } else if (req.url == "/timer") {
         let sse = new SSE(req, res);
+        let count = 0;
         let timer = setInterval(() => {
             count += 1;
             sse.send("This is message " + count + ".");
@@ -45,7 +47,7 @@ describe("SSE Tests", () => {
     });
 
     it("should connect to the server and receive string data as expected", done => {
-        var client = new EventSource("http://localhost:3000/string");
+        var client = new dEventSource("http://localhost:3000/string") as EventSource;
 
         client.onmessage = (e) => {
             assert.strictEqual(e.type, "message");
@@ -58,7 +60,7 @@ describe("SSE Tests", () => {
     });
 
     it("should connect to the server and receive JSON data as expected", done => {
-        var client = new EventSource("http://localhost:3000/json");
+        var client = new dEventSource("http://localhost:3000/json") as EventSource;
 
         client.onmessage = (e) => {
             assert.strictEqual(!!e.lastEventId, true);
@@ -70,7 +72,7 @@ describe("SSE Tests", () => {
     });
 
     it("should connect to the server and receive an event as expected", done => {
-        var client = new EventSource("http://localhost:3000/event");
+        var client = new dEventSource("http://localhost:3000/event") as EventSource;
 
         client.addEventListener("my-event", (e) => {
             assert.strictEqual(e.type, "my-event");
@@ -82,23 +84,27 @@ describe("SSE Tests", () => {
         });
     });
 
-    it("should connect to the server and receive multiple times of data as expected", done => {
-        var client = new EventSource("http://localhost:3000/timer");
+    it("should connect to the server and receive multiple times of data as expected", async () => {
+        var client = new dEventSource("http://localhost:3000/timer") as EventSource;
+        const chunks: string[] = [];
 
-        client.onmessage = (e) => {
-            assert.strictEqual(e.type, "message");
-            assert.strictEqual(!!e.lastEventId, true);
-            assert.strictEqual(e.data, "This is message " + count + ".");
+        for await (const data of jsext.read(client)) {
+            chunks.push(...data.split("\n"));
 
-            if (count === 3) {
+            if (chunks.length === 3) {
                 client.close();
-                done();
             }
-        };
+        }
+
+        assert.deepStrictEqual(chunks, [
+            "This is message 1.",
+            "This is message 2.",
+            "This is message 3."
+        ]);
     });
 
     it("should connect to the server with a custom ID as expected", done => {
-        var client = new EventSource("http://localhost:3000/customId?id=abc");
+        var client = new dEventSource("http://localhost:3000/customId?id=abc") as EventSource;
 
         client.onmessage = (e) => {
             assert.strictEqual(e.type, "message");

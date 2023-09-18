@@ -1,5 +1,4 @@
-import { IncomingMessage, ServerResponse } from "http";
-import { Http2ServerRequest, Http2ServerResponse } from "http2";
+import type { IncomingMessage, ServerResponse } from "http";
 import { nanoid } from "nanoid";
 
 const MarkClosed = new Set<string>();
@@ -19,17 +18,18 @@ export class SSE {
      * connecting via EventSource.
      */
     readonly id: string;
-    private _resWriteHead: ServerResponse["writeHead"] | Http2ServerResponse["writeHead"];
+    private _resWriteHead: ServerResponse["writeHead"];
     private _resWrite: ServerResponse["write"];
     private _resEnd: ServerResponse["end"];
+    private [closed]?: boolean;
 
     /**
      * @param retry The re-connection time to use when attempting to send the 
      *  event.
      */
     constructor(
-        protected req: IncomingMessage | Http2ServerRequest,
-        protected res: ServerResponse | Http2ServerResponse,
+        protected req: IncomingMessage,
+        protected res: ServerResponse,
         readonly retry: number = 0
     ) {
         // Store the original functions in case they're being overridden.
@@ -37,10 +37,11 @@ export class SSE {
         this._resWrite = res.write.bind(res);
         this._resEnd = res.end.bind(res);
 
+        const query = (req as any)["query"];
         let id: string;
 
-        if (typeof req["query"] === "object" && req["query"]) {
-            id = req["query"]["id"];
+        if (typeof query === "object" && query) {
+            id = query["id"];
         } else {
             const searchParams = new URL(req.url as string, "http://localhost").searchParams;
             id = searchParams.get("id") as string;
@@ -75,7 +76,14 @@ export class SSE {
         return this;
     }
 
-    /** Sends data to the client. */
+    /**
+     * Sends data to the client.
+     * 
+     * Multiple pieces of data may be buffered and send out together (detected
+     * in **Bun**), if so, they will be concatenated with `\n` on the
+     * client-side.  If this is not intended, use `emit` and `addEventListener`
+     * instead.
+     */
     send(data: any) {
         this.ensureHead();
 
@@ -135,7 +143,7 @@ export namespace SSE {
      * Checks if the request comes from an EventSource. Will check the header 
      * field `accept`, see if it's `text/event-stream`.
      */
-    export function isEventSource(req: IncomingMessage | Http2ServerRequest) {
+    export function isEventSource(req: IncomingMessage) {
         return req.method == "GET" && req.headers.accept == "text/event-stream";
     }
 }

@@ -13,7 +13,7 @@ npm install @ayonli/sse
 
 ```ts
 import * as http from "http";
-import SSE from "@ayonli/sse";
+import { SSE } from "@ayonli/sse";
 
 const store = new Map<string, SSE>();
 

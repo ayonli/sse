@@ -1,15 +1,16 @@
 {
     "name": "@ayonli/sse",
-    "version": "0.4.0",
+    "version": "0.4.1",
     "description": "Server-Sent Events implementation for Node.js with Session Support Enhancement.",
     "main": "index.js",
-    "types": "index.d.ts",
     "scripts": {
-        "prepublishOnly": "tsc --module commonjs --target es2015 --declaration true --sourcemap true --noImplicitThis true index.ts",
-        "postpublish": "ls index.* | grep -v index.ts | xargs rm -f",
-        "pretest": "tsc --module commonjs --target es2015 test.ts",
-        "posttest": "rm -f test.js* && rm -f index.js*",
-        "test": "mocha"
+        "build": "tsc --module commonjs --target es2015 --sourcemap --strict *.ts",
+        "prepublishOnly": "npm run build",
+        "postpublish": "ls *.js | xargs rm; ls *.js.map | xargs rm",
+        "pretest": "npm run build",
+        "posttest": "npm run postpublish",
+        "test": "mocha test.js",
+        "test:bun": "bun run ./node_modules/mocha/bin/mocha test.ts"
     },
     "keywords": [
         "see"
@@ -24,9 +25,11 @@
     },
     "license": "MIT",
     "devDependencies": {
+        "@ayonli/jsext": "^0.4.5",
         "@types/mocha": "^5.2.7",
-        "@types/node": "^14.14.31",
+        "@types/node": "^20.6.2",
         "eventsource": "^1.1.2",
+        "js-magic": "^1.4.1",
         "mocha": "^6.1.4",
         "typescript": "^4.9.5"
     },
