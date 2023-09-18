@@ -4,7 +4,6 @@ import * as assert from "assert";
 // @ts-ignore
 import dEventSource = require("eventsource");
 import jsext from "@ayonli/jsext";
-import "js-magic";
 
 var server = http.createServer((req, res) => {
     if (!SSE.isEventSource(req)) {
